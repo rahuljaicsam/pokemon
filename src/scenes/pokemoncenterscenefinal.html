@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Center - FireRed Style</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #game-container {
+            position: relative;
+            width: 480px;
+            height: 320px;
+            background-color: #000;
+            overflow: hidden;
+        }
+        
+        #game-canvas {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        
+        #dialog-box {
+            position: absolute;
+            bottom: 10px;
+            left: 10%;
+            width: 80%;
+            background-color: white;
+            border: 4px solid #555;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: 'Arial', sans-serif;
+            font-size: 16px;
+            display: none;
+            z-index: 100;
+        }
+        
+        #controls-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            font-size: 12px;
+            background-color: rgba(0,0,0,0.5);
+            padding: 5px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas" width="480" height="320"></canvas>
+        <div id="dialog-box"></div>
+        <div id="controls-info">
+            Arrow Keys: Move | A: Interact (Z key) | B: Cancel (X key)
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('game-canvas');
+            const ctx = canvas.getContext('2d');
+            const dialogBox = document.getElementById('dialog-box');
+            
+            // Game state
+            const gameState = {
+                playerX: 240,
+                playerY: 200,
+                playerWidth: 16,
+                playerHeight: 20,
+                playerSpeed: 2,
+                playerDirection: 'down',
+                playerMoving: false,
+                playerFrame: 0,
+                animationCounter: 0,
+                interacting: false,
+                showDialog: false,
+                dialogText: '',
+                scale: 2, // Scale factor for rendering
+                keysPressed: {}
+            };
+            
+            // Collision map - 1 means collision, 0 means walkable
+            const collisionMap = [
+                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1],
+                [1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1],
+                [1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1],
+                [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+            ];
+            
+            // NPC positions
+            const npcs = [
+                { x: 240, y: 92, width: 16, height: 20, type: 'nurse', dialog: 'Welcome to the Pokémon Center! Would you like me to heal your Pokémon?' },
+                { x: 340, y: 22, width: 16, height: 32, type: 'pc', dialog: 'You accessed the Pokémon Storage System.' },
+                { x: 350, y: 150, width: 16, height: 20, type: 'trainer1', dialog: 'I always make sure to keep my Pokémon healthy!' },
+                { x: 65, y: 160, width: 16, height: 20, type: 'trainer2', dialog: 'BE SURE TO FOLLOW @Jaicsam!' },
+                { x: 210, y: 92, width: 16, height : 20, type: 'chansey', dialog: 'Chansey , Chansey' }
+            ];
+            
+            // Load images
+            const bgImage = new Image();
+            bgImage.src = 'https://archives.bulbagarden.net/media/upload/a/a3/Pok%C3%A9mon_Center_inside_FRLG.png';
+            
+            const characterSpritesheet = new Image();
+            characterSpritesheet.src = 'https://www.spriters-resource.com/resources/sheets/4/3698.png';
+            
+            // Wait for images to load
+            Promise.all([
+                new Promise(resolve => bgImage.onload = resolve),
+                new Promise(resolve => characterSpritesheet.onload = resolve)
+            ]).then(() => {
+                // Start the game loop
+                gameLoop();
+                
+                // Set up input handlers
+                setupInputHandlers();
+            });
+            
+            function setupInputHandlers() {
+                // Key down handler
+                window.addEventListener('keydown', function(e) {
+                    gameState.keysPressed[e.key] = true;
+                    
+                    // A button (Z key) for interaction
+                    if ((e.key === 'z' || e.key === 'Z') && !gameState.showDialog) {
+                        checkInteraction();
+                    }
+                    
+                    // B button (X key) to close dialog
+                    if ((e.key === 'x' || e.key === 'X') && gameState.showDialog) {
+                        gameState.showDialog = false;
+                        dialogBox.style.display = 'none';
+                    }
+                });
+                
+                // Key up handler
+                window.addEventListener('keyup', function(e) {
+                    gameState.keysPressed[e.key] = false;
+                    
+                    // If no movement keys are pressed, stop player movement
+                    if (!gameState.keysPressed['ArrowUp'] && 
+                        !gameState.keysPressed['ArrowDown'] && 
+                        !gameState.keysPressed['ArrowLeft'] && 
+                        !gameState.keysPressed['ArrowRight']) {
+                        gameState.playerMoving = false;
+                    }
+                });
+            }
+            
+            function checkInteraction() {
+                // Only check for interaction if not already in dialog
+                if (gameState.showDialog) return;
+                
+                // Check interaction range (in front of player)
+                let interactX = gameState.playerX;
+                let interactY = gameState.playerY;
+                
+                // Set interaction point based on direction
+                switch (gameState.playerDirection) {
+                    case 'up':
+                        interactY -= 20;
+                        break;
+                    case 'down':
+                        interactY += 20;
+                        break;
+                    case 'left':
+                        interactX -= 20;
+                        break;
+                    case 'right':
+                        interactX += 20;
+                        break;
+                }
+                
+                // Check if interacting with an NPC
+                for (const npc of npcs) {
+                    // Simple collision detection for interaction
+                    if (interactX < npc.x + npc.width &&
+                        interactX + gameState.playerWidth > npc.x &&
+                        interactY < npc.y + npc.height &&
+                        interactY + gameState.playerHeight > npc.y) {
+                        
+                        // Show dialog
+                        gameState.showDialog = true;
+                        gameState.dialogText = npc.dialog;
+                        dialogBox.textContent = npc.dialog;
+                        dialogBox.style.display = 'block';
+                        return;
+                    }
+                }
+            }
+            
+            function updatePlayerPosition() {
+                if (gameState.showDialog) return; // Don't move when dialog is showing
+                
+                let newX = gameState.playerX;
+                let newY = gameState.playerY;
+                gameState.playerMoving = false;
+                
+                // Handle movement based on keys pressed
+                if (gameState.keysPressed['ArrowUp']) {
+                    newY -= gameState.playerSpeed;
+                    gameState.playerDirection = 'up';
+                    gameState.playerMoving = true;
+                } else if (gameState.keysPressed['ArrowDown']) {
+                    newY += gameState.playerSpeed;
+                    gameState.playerDirection = 'down';
+                    gameState.playerMoving = true;
+                } else if (gameState.keysPressed['ArrowLeft']) {
+                    newX -= gameState.playerSpeed;
+                    gameState.playerDirection = 'left';
+                    gameState.playerMoving = true;
+                } else if (gameState.keysPressed['ArrowRight']) {
+                    newX += gameState.playerSpeed;
+                    gameState.playerDirection = 'right';
+                    gameState.playerMoving = true;
+                }
+                
+                // Collision detection with map boundaries
+                const tileSize = 16 * gameState.scale;
+                
+                // Calculate grid position
+                const gridX = Math.floor(newX / tileSize);
+                const gridY = Math.floor(newY / tileSize);
+                
+                // Check if the new position is within walkable area
+                if (gridX >= 0 && gridX < collisionMap[0].length && 
+                    gridY >= 0 && gridY < collisionMap.length &&
+                    collisionMap[gridY][gridX] === 0) {
+                    
+                    // Also check the player's feet (bottom of sprite)
+                    const footGridY = Math.floor((newY + gameState.playerHeight - 5) / tileSize);
+                    if (footGridY >= 0 && footGridY < collisionMap.length &&
+                        collisionMap[footGridY][gridX] === 0) {
+                        
+                        // Check collision with NPCs
+                        let npcCollision = false;
+                        for (const npc of npcs) {
+                            if (newX < npc.x + npc.width &&
+                                newX + gameState.playerWidth > npc.x &&
+                                newY < npc.y + npc.height &&
+                                newY + gameState.playerHeight > npc.y) {
+                                npcCollision = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!npcCollision) {
+                            gameState.playerX = newX;
+                            gameState.playerY = newY;
+                        }
+                    }
+                }
+                
+                // Update animation frame
+                if (gameState.playerMoving) {
+                    gameState.animationCounter++;
+                    if (gameState.animationCounter >= 10) {
+                        gameState.animationCounter = 0;
+                        gameState.playerFrame = (gameState.playerFrame + 1) % 2;
+                    }
+                } else {
+                    gameState.playerFrame = 1; // Standing frame
+                }
+            }
+            
+            function drawPokemonCenter() {
+                // Clear canvas
+                ctx.fillStyle = '#F8F8F8';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Scale the background image to fit the canvas (3x scale from original 240×160)
+                ctx.drawImage(bgImage, 0, 0, 240, 160, 0, 0, 480, 320);
+                
+                // Draw NPCs
+                for (const npc of npcs) {
+                    if (npc.type === 'nurse') {
+                        // Draw Nurse Joy
+                        ctx.drawImage(
+                            characterSpritesheet,
+                            9, 345, 16, 20,
+                            npc.x, npc.y, 16 * gameState.scale, 20 * gameState.scale
+                        );
+                    } else if (npc.type === 'pc') {
+                        // Just using the background image for PC, it's already there
+                    } else if (npc.type === 'trainer1') {
+                        // Draw random trainer
+                        ctx.drawImage(
+                            characterSpritesheet,
+                            43, 46, 16, 20,
+                            npc.x, npc.y, 16 * gameState.scale, 20 * gameState.scale
+                        );
+                    } else if (npc.type === 'trainer2') {
+                        // Draw random trainer
+                        ctx.drawImage(
+                            characterSpritesheet,
+                            26, 71, 16, 20,
+                            npc.x, npc.y, 16 * gameState.scale, 20 * gameState.scale
+                        );
+                    } else if (npc.type === 'chansey') {
+                        // Draw random trainer
+                        ctx.drawImage(
+                            characterSpritesheet,
+                            145, 2322, 16, 16,
+                            npc.x, npc.y, 16 * gameState.scale, 16 * gameState.scale
+                        );
+                    }
+                }
+                // Draw player character
+                let spriteX = 0;
+                let spriteY = 46;
+                
+                switch (gameState.playerDirection) {
+                    case 'down':
+                        if (gameState.playerMoving) {
+                            spriteX = gameState.playerFrame === 0 ? 9 : 43;
+                        } else {
+                            spriteX = 26;
+                        }
+                        break;
+                    case 'up':
+                        if (gameState.playerMoving) {
+                            spriteX = gameState.playerFrame === 0 ? 94 : 60;
+                        } else {
+                            spriteX = 77;
+                        }
+                        break;
+                    case 'left':
+                        if (gameState.playerMoving) {
+                            spriteX = gameState.playerFrame === 0 ? 111 : 145;
+                        } else {
+                            spriteX = 128;
+                        }
+                        break;
+                    case 'right':
+                        if (gameState.playerMoving) {
+                            spriteX = gameState.playerFrame === 0 ? 162 : 196;
+                        } else {
+                            spriteX = 179;
+                        }
+                        break;
+                }
+                
+                ctx.drawImage(
+                    characterSpritesheet,
+                    spriteX, spriteY, 16, 20,
+                    gameState.playerX, gameState.playerY, 16 * gameState.scale, 20 * gameState.scale
+                );
+            }
+            
+            function gameLoop() {
+                // Update player position
+                updatePlayerPosition();
+                
+                // Draw the game
+                drawPokemonCenter();
+                
+                // Request next frame
+                requestAnimationFrame(gameLoop);
+            }
+        });
+    </script>
+</body>
+</html>

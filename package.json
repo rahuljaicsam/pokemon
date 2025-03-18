@@ -1,0 +1,21 @@
+{
+  "name": "pokemon-web-game",
+  "version": "1.0.0",
+  "description": "A web-based Pokemon game using Phaser.js",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "parcel src/index.html",
+    "build": "parcel build src/index.html"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "phaser": "^3.70.0"
+  },
+  "devDependencies": {
+    "@parcel/reporter-dev-server": "^2.13.3",
+    "parcel": "^2.13.3",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
+    "util": "^0.12.5"
+  }
+}
