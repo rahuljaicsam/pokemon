@@ -1,5 +1,6 @@
 import { gameState } from '../config/game-state';
 import { POKEMON_DATA, calculateStats, getMovesForLevel } from '../config/pokemon-data';
+import { initializePokemonMoves } from '../utils/moveInitializer';
 
 export default class WorldScene extends Phaser.Scene {
     constructor() {
@@ -273,17 +274,24 @@ export default class WorldScene extends Phaser.Scene {
         }
 
         const stats = calculateStats(pokemonKey, level);
-        const moves = getMovesForLevel(pokemonKey, level);
 
-        return {
+        // Create the Pokémon object
+        const pokemon = {
             key: pokemonKey,
+            id: pokemonData.id,
             name: pokemonData.name,
             level,
             types: pokemonData.types,
             stats,
             currentHp: stats.hp,
-            moves: moves.slice(0, 4) // Limit to 4 moves
+            exp: level * level * level,
+            nextLevelExp: (level + 1) * (level + 1) * (level + 1)
         };
+
+        // Initialize moves using the moveInitializer
+        initializePokemonMoves(pokemon);
+
+        return pokemon;
     }
 
     enterPokemonCenter() {

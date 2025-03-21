@@ -6,55 +6,94 @@ export const POKEMON_DATA = {
         id: 1,
         name: 'Bulbasaur',
         types: [TYPES.GRASS, TYPES.POISON],
-        baseStats: { hp: 45, attack: 49, defense: 49, spAtk: 65, spDef: 65, speed: 45 }
+        baseStats: { hp: 45, attack: 49, defense: 49, spAtk: 65, spDef: 65, speed: 45 },
+        moves: {
+            1: [MOVES.TACKLE],
+            3: [MOVES.GROWL],
+            7: [MOVES.VINE_WHIP],
+            10: [MOVES.LEECH_SEED]
+        }
     },
     IVYSAUR: {
         id: 2,
         name: 'Ivysaur',
         types: [TYPES.GRASS, TYPES.POISON],
-        baseStats: { hp: 60, attack: 62, defense: 63, spAtk: 80, spDef: 80, speed: 60 }
+        baseStats: { hp: 60, attack: 62, defense: 63, spAtk: 80, spDef: 80, speed: 60 },
+        moves: {
+            1: [MOVES.TACKLE, MOVES.GROWL, MOVES.VINE_WHIP],
+            3: [MOVES.LEECH_SEED]
+        }
     },
     VENUSAUR: {
         id: 3,
         name: 'Venusaur',
         types: [TYPES.GRASS, TYPES.POISON],
-        baseStats: { hp: 80, attack: 82, defense: 83, spAtk: 100, spDef: 100, speed: 80 }
+        baseStats: { hp: 80, attack: 82, defense: 83, spAtk: 100, spDef: 100, speed: 80 },
+        moves: {
+            1: [MOVES.TACKLE, MOVES.GROWL, MOVES.VINE_WHIP, MOVES.LEECH_SEED]
+        }
     },
     CHARMANDER: {
         id: 4,
         name: 'Charmander',
         types: [TYPES.FIRE],
-        baseStats: { hp: 39, attack: 52, defense: 43, spAtk: 60, spDef: 50, speed: 65 }
+        baseStats: { hp: 39, attack: 52, defense: 43, spAtk: 60, spDef: 50, speed: 65 },
+        moves: {
+            1: [MOVES.SCRATCH],
+            4: [MOVES.GROWL],
+            7: [MOVES.EMBER],
+            10: [MOVES.METAL_CLAW]
+        }
     },
     CHARMELEON: {
         id: 5,
         name: 'Charmeleon',
         types: [TYPES.FIRE],
-        baseStats: { hp: 58, attack: 64, defense: 58, spAtk: 80, spDef: 65, speed: 80 }
+        baseStats: { hp: 58, attack: 64, defense: 58, spAtk: 80, spDef: 65, speed: 80 },
+        moves: {
+            1: [MOVES.SCRATCH, MOVES.GROWL, MOVES.EMBER],
+            3: [MOVES.METAL_CLAW]
+        }
     },
     CHARIZARD: {
         id: 6,
         name: 'Charizard',
         types: [TYPES.FIRE, TYPES.FLYING],
-        baseStats: { hp: 78, attack: 84, defense: 78, spAtk: 109, spDef: 85, speed: 100 }
+        baseStats: { hp: 78, attack: 84, defense: 78, spAtk: 109, spDef: 85, speed: 100 },
+        moves: {
+            1: [MOVES.SCRATCH, MOVES.GROWL, MOVES.EMBER, MOVES.METAL_CLAW]
+        }
     },
     SQUIRTLE: {
         id: 7,
         name: 'Squirtle',
         types: [TYPES.WATER],
-        baseStats: { hp: 44, attack: 48, defense: 65, spAtk: 50, spDef: 64, speed: 43 }
+        baseStats: { hp: 44, attack: 48, defense: 65, spAtk: 50, spDef: 64, speed: 43 },
+        moves: {
+            1: [MOVES.TACKLE],
+            4: [MOVES.TAIL_WHIP],
+            7: [MOVES.BUBBLE],
+            10: [MOVES.WATER_GUN]
+        }
     },
     WARTORTLE: {
         id: 8,
         name: 'Wartortle',
         types: [TYPES.WATER],
-        baseStats: { hp: 59, attack: 63, defense: 80, spAtk: 65, spDef: 80, speed: 58 }
+        baseStats: { hp: 59, attack: 63, defense: 80, spAtk: 65, spDef: 80, speed: 58 },
+        moves: {
+            1: [MOVES.TACKLE, MOVES.TAIL_WHIP, MOVES.BUBBLE],
+            3: [MOVES.WATER_GUN]
+        }
     },
     BLASTOISE: {
         id: 9,
         name: 'Blastoise',
         types: [TYPES.WATER],
-        baseStats: { hp: 79, attack: 83, defense: 100, spAtk: 85, spDef: 105, speed: 78 }
+        baseStats: { hp: 79, attack: 83, defense: 100, spAtk: 85, spDef: 105, speed: 78 },
+        moves: {
+            1: [MOVES.TACKLE, MOVES.TAIL_WHIP, MOVES.BUBBLE, MOVES.WATER_GUN]
+        }
     },
     CATERPIE: {
         id: 10,
@@ -297,21 +336,12 @@ export const POKEMON_DATA = {
         id: 25,
         name: 'Pikachu',
         types: [TYPES.ELECTRIC],
-        baseStats: {
-            hp: 35,
-            attack: 60,
-            defense: 44,
-            spAtk: 40,
-            spDef: 54,
-            speed: 55
-        },
-        evolution: {
-            level: 25,
-            evolvesTo: 'RAICHU'
-        },
+        baseStats: { hp: 35, attack: 55, defense: 40, spAtk: 50, spDef: 50, speed: 90 },
         moves: {
-            1: [MOVES.TACKLE],
-            4: [MOVES.THUNDER_SHOCK]
+            1: [MOVES.THUNDER_SHOCK],
+            3: [MOVES.GROWL],
+            6: [MOVES.TAIL_WHIP],
+            10: [MOVES.QUICK_ATTACK]
         }
     },
     RAICHU: {
@@ -1115,15 +1145,28 @@ export const calculateStats = (pokemon, level) => {
     };
 };
 
-export const getMovesForLevel = (pokemonKey, level) => {
-    const pokemon = POKEMON_DATA[pokemonKey];
-    const moves = [];
+export function getMovesForLevel(pokemonKey, level) {
+    console.log(`[PokemonData] Getting moves for ${pokemonKey} at level ${level}`);
+    const pokemonData = POKEMON_DATA[pokemonKey];
+    if (!pokemonData) {
+        console.error(`[PokemonData] No data found for Pokémon: ${pokemonKey}`);
+        return ['TACKLE'];
+    }
+
+    console.log(`[PokemonData] Available moves for ${pokemonKey}:`, pokemonData.moves);
     
-    Object.entries(pokemon.moves).forEach(([moveLevel, movesAtLevel]) => {
-        if (parseInt(moveLevel) <= level) {
-            moves.push(...movesAtLevel);
-        }
-    });
+    // Get all moves available at or below the current level
+    const availableMoves = Object.entries(pokemonData.moves)
+        .filter(([moveKey, levelReq]) => levelReq <= level)
+        .map(([moveKey]) => moveKey);
+
+    console.log(`[PokemonData] Moves available at level ${level}:`, availableMoves);
     
+    // Sort by level requirement (highest first) and take the last 4
+    const moves = availableMoves
+        .sort((a, b) => pokemonData.moves[a] - pokemonData.moves[b])
+        .slice(-4);
+
+    console.log(`[PokemonData] Selected moves for level ${level}:`, moves);
     return moves;
-}; 
+} 

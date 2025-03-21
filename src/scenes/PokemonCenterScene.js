@@ -11,162 +11,272 @@ export default class PokemonCenterScene extends Phaser.Scene {
         this.nurse = null;
         this.counter = null;
         this.exitArea = null;
+        this.pc = null;
+        this.pcInteractionZone = null;
+        this.chansey = null;
+        this.healingAnimation = null;
         console.log('PokemonCenterScene constructor initialized');
     }
 
+    preload() {
+        // Load Pokemon Center assets
+        this.load.image('center-tiles', 'https://raw.githubusercontent.com/jdtjenkins/pokemon-assets/main/tilesets/pokemon-center-tiles.png');
+        this.load.image('center-floor', 'https://raw.githubusercontent.com/jdtjenkins/pokemon-assets/main/tilesets/pokemon-center-floor.png');
+        this.load.image('nurse-joy', 'https://raw.githubusercontent.com/jdtjenkins/pokemon-assets/main/sprites/nurse-joy.png');
+        this.load.image('chansey', 'https://raw.githubusercontent.com/jdtjenkins/pokemon-assets/main/sprites/chansey.png');
+        this.load.image('pc', 'https://raw.githubusercontent.com/jdtjenkins/pokemon-assets/main/sprites/pc.png');
+        this.load.image('healing-machine', 'https://raw.githubusercontent.com/jdtjenkins/pokemon-assets/main/sprites/healing-machine.png');
+        this.load.spritesheet('healing-anim', 'https://raw.githubusercontent.com/jdtjenkins/pokemon-assets/main/sprites/healing-animation.png', 
+            { frameWidth: 32, frameHeight: 32 });
+    }
+
     create() {
-        console.log('PokemonCenterScene create method started');
-        // Create the interior background
+        console.log('[PokemonCenterScene] Create method started');
         try {
-            this.add.rectangle(400, 300, 800, 600, 0xFFFFFF);
-            console.log('Background created successfully');
-        } catch (error) {
-            console.error('Error creating background:', error);
-        }
-        
-        // Create walls
-        try {
+            // Create themed background with proper styling
+            const background = this.add.rectangle(400, 300, 800, 600, 0xF0F8FF);
+            console.log('[PokemonCenterScene] Background created');
+            
+            // Create floor pattern
+            for (let x = 0; x < 800; x += 40) {
+                for (let y = 100; y < 600; y += 40) {
+                    this.add.rectangle(x + 20, y + 20, 40, 40, 0xE8E8E8)
+                        .setStrokeStyle(1, 0xD0D0D0);
+                }
+            }
+            
+            // Create walls with better styling
+            // Top wall with decorative elements
+            this.add.rectangle(400, 50, 800, 100, 0xFFE4E1)
+                .setStrokeStyle(2, 0xDEB887);
+                
+            // Side walls
+            this.add.rectangle(50, 300, 100, 600, 0xFFE4E1)
+                .setStrokeStyle(2, 0xDEB887);
+            this.add.rectangle(750, 300, 100, 600, 0xFFE4E1)
+                .setStrokeStyle(2, 0xDEB887);
+            
+            // Create healing counter area
+            const counterBase = this.add.rectangle(400, 150, 300, 80, 0xDEB887)
+                .setStrokeStyle(2, 0x8B4513);
+            
+            // Add healing machine
+            const healingMachine = this.add.rectangle(400, 120, 200, 40, 0x4169E1)
+                .setStrokeStyle(2, 0x000080);
+            
+            // Add healing orbs
+            for (let i = 0; i < 6; i++) {
+                this.add.circle(320 + i * 30, 120, 8, 0xFF69B4)
+                    .setStrokeStyle(1, 0xFF1493);
+            }
+            
+            // Create nurse area with better visuals
+            this.nurse = this.add.rectangle(400, 180, 32, 32, 0xFFB6C1)
+                .setStrokeStyle(1, 0xFF69B4);
+            
+            // Create PC area with modern styling
+            this.pc = this.add.rectangle(600, 160, 48, 64, 0x4682B4)
+                .setStrokeStyle(2, 0x4169E1);
+            
+            // Add PC screen
+            this.add.rectangle(600, 150, 40, 30, 0x87CEEB)
+                .setStrokeStyle(1, 0x4169E1);
+            
+            // Create PC interaction zone
+            this.pcInteractionZone = this.add.rectangle(600, 200, 48, 48, 0x90EE90, 0.2);
+            
+            // Add decorative plants
+            this.addDecorations();
+            
+            // Create healing spot with subtle indicator
+            this.healSpot = this.add.rectangle(400, 220, 64, 32, 0xFFFF00, 0.1);
+            
+            // Add collision walls (invisible)
             this.walls = this.physics.add.staticGroup();
-            console.log('Walls static group created');
-        } catch (error) {
-            console.error('Error creating walls static group:', error);
-        }
-        
-        // Left wall
-        try {
-            this.walls.add(this.add.rectangle(0, 300, 20, 600, 0x666666));
-            this.walls.add(this.add.rectangle(800, 300, 20, 600, 0x666666));
-            this.walls.add(this.add.rectangle(400, 0, 800, 20, 0x666666));
-            this.walls.add(this.add.rectangle(200, 590, 400, 20, 0x666666));
-            this.walls.add(this.add.rectangle(600, 590, 400, 20, 0x666666));
-            console.log('All walls created successfully');
-        } catch (error) {
-            console.error('Error creating wall rectangles:', error);
-        }
-        
-        // Create counter
-        try {
-            console.log('Attempting to create counter with texture');
-            this.counter = this.physics.add.staticImage(400, 200, 'counter');
-            if (!this.textures.exists('counter')) {
-                console.log('Counter texture not found, creating fallback rectangle');
-                this.counter = this.add.rectangle(400, 200, 300, 40, 0x8B4513);
-                this.physics.add.existing(this.counter, true);
-            }
-            console.log('Counter created successfully');
-        } catch (error) {
-            console.error('Error creating counter:', error);
-            // Fallback if the counter creation fails completely
-            try {
-                this.counter = this.add.rectangle(400, 200, 300, 40, 0x8B4513);
-                this.physics.add.existing(this.counter, true);
-                console.log('Created fallback counter after error');
-            } catch (fallbackError) {
-                console.error('Critical error: Failed to create fallback counter:', fallbackError);
-            }
-        }
-        
-        // Create nurse
-        try {
-            this.nurse = this.add.rectangle(400, 160, 32, 32, 0xFF69B4);
-            console.log('Nurse created successfully');
-        } catch (error) {
-            console.error('Error creating nurse:', error);
-        }
-        
-        // Create healing spot marker
-        try {
-            this.healSpot = this.add.rectangle(400, 250, 32, 32, 0xFFFF00, 0.3);
-            console.log('Healing spot created successfully');
-        } catch (error) {
-            console.error('Error creating healing spot:', error);
-        }
+            this.walls.add(this.add.rectangle(0, 300, 20, 600, 0x666666).setVisible(false));
+            this.walls.add(this.add.rectangle(800, 300, 20, 600, 0x666666).setVisible(false));
+            this.walls.add(this.add.rectangle(400, 0, 800, 20, 0x666666).setVisible(false));
+            this.walls.add(this.add.rectangle(400, 590, 800, 20, 0x666666).setVisible(false));
+            
+            // Create counter collision
+            this.counter = this.physics.add.staticSprite(400, 150, null)
+                .setDisplaySize(300, 80);
+            
+            // Add PC collision
+            this.physics.add.existing(this.pc, true);
         
         // Create player at entrance
-        try {
             this.player = this.add.rectangle(400, 550, 32, 32, 0xFF0000);
             this.physics.world.enable(this.player);
-            console.log('Player created and physics enabled');
-        } catch (error) {
-            console.error('Error creating player or enabling physics:', error);
-        }
         
         // Add exit area
-        try {
-            this.exitArea = this.add.rectangle(400, 580, 64, 20, 0x00FF00, 0.3);
+            this.exitArea = this.add.rectangle(400, 580, 64, 20, 0x00FF00, 0.2);
             this.physics.world.enable(this.exitArea, Phaser.Physics.Arcade.STATIC_BODY);
-            console.log('Exit area created and physics enabled');
-        } catch (error) {
-            console.error('Error creating exit area or enabling physics:', error);
-        }
         
         // Set up collision
-        try {
             this.physics.add.collider(this.player, this.walls);
             this.physics.add.collider(this.player, this.counter);
-            console.log('Colliders set up successfully');
-        } catch (error) {
-            console.error('Error setting up colliders:', error);
-        }
+            this.physics.add.collider(this.player, this.pc);
         
         // Set up keyboard controls
-        try {
             this.cursors = this.input.keyboard.createCursorKeys();
-            console.log('Keyboard controls set up successfully');
+            
+            // Add helper text with better styling
+            const textBg = this.add.rectangle(400, 350, 500, 60, 0x000000, 0.7);
+            this.add.text(400, 350, 'Press SPACE to heal when near the counter\nPress A to use PC when near it', {
+                fontSize: '18px',
+                fill: '#FFFFFF',
+                align: 'center',
+                padding: { x: 20, y: 10 },
+                backgroundColor: '#00000000'
+            }).setOrigin(0.5);
+            
+            // Add interaction keys
+            this.setupInteractionKeys();
+            
+            // Add exit detection
+            this.physics.add.overlap(this.player, this.exitArea, () => {
+                console.log('[PokemonCenterScene] Player overlapped with exit area');
+                this.exitPokemonCenter();
+            });
+            
+            console.log('[PokemonCenterScene] Create method completed successfully');
         } catch (error) {
-            console.error('Error setting up keyboard controls:', error);
+            console.error('[PokemonCenterScene] Error in create method:', error);
         }
+    }
+    
+    addDecorations() {
+        // Add potted plants in corners
+        const plantPositions = [
+            { x: 100, y: 100 },
+            { x: 700, y: 100 },
+            { x: 100, y: 500 },
+            { x: 700, y: 500 }
+        ];
         
-        // Add interaction key
+        plantPositions.forEach(pos => {
+            // Plant pot
+            this.add.rectangle(pos.x, pos.y + 10, 40, 20, 0x8B4513)
+                .setStrokeStyle(1, 0x654321);
+            // Plant
+            this.add.rectangle(pos.x, pos.y - 15, 30, 40, 0x228B22)
+                .setStrokeStyle(1, 0x006400);
+        });
+        
+        // Add welcome mat
+        this.add.rectangle(400, 550, 100, 40, 0x8B4513)
+            .setStrokeStyle(1, 0x654321)
+            .setAlpha(0.3);
+            
+        // Add some wall decorations
+        const wallDecorations = [
+            { x: 200, y: 50 },
+            { x: 600, y: 50 }
+        ];
+        
+        wallDecorations.forEach(pos => {
+            this.add.rectangle(pos.x, pos.y, 40, 40, 0xFFD700)
+                .setStrokeStyle(1, 0xDAA520);
+        });
+    }
+    
+    setupInteractionKeys() {
+        console.log('[PokemonCenterScene] Setting up interaction keys');
         try {
+            // A key for PC interactions
+            this.input.keyboard.on('keydown-A', () => {
+                console.log('[PokemonCenterScene] A key pressed');
+                const pcDistance = Phaser.Math.Distance.Between(
+                    this.player.x, this.player.y,
+                    this.pcInteractionZone.x, this.pcInteractionZone.y
+                );
+                
+                console.log('[PokemonCenterScene] Distance to PC:', pcDistance);
+                if (pcDistance < 50) {
+                    console.log('[PokemonCenterScene] Player is in PC range, accessing storage system');
+                    this.accessPCStorage();
+                } else {
+                    console.log('[PokemonCenterScene] Player too far from PC');
+                }
+            });
+
+            // Space key for healing
             this.input.keyboard.on('keydown-SPACE', () => {
-                console.log('Space key pressed');
-                // Check if player is in healing spot
-                try {
+                console.log('[PokemonCenterScene] Space key pressed');
                     const distance = Phaser.Math.Distance.Between(
                         this.player.x, this.player.y,
                         this.healSpot.x, this.healSpot.y
                     );
                     
-                    console.log('Distance to healing spot:', distance);
+                console.log('[PokemonCenterScene] Distance to healing spot:', distance);
                     if (distance < 50) {
-                        console.log('Player is in healing range, initiating healing');
+                    console.log('[PokemonCenterScene] Player is in healing range, initiating healing');
                         this.healPokemon();
                     } else {
-                        console.log('Player not in healing range (distance: ' + distance + ')');
-                    }
-                } catch (error) {
-                    console.error('Error calculating distance or healing:', error);
+                    console.log('[PokemonCenterScene] Player too far from healing spot');
                 }
             });
-            console.log('Space key interaction set up successfully');
+
+            console.log('[PokemonCenterScene] Interaction keys setup completed');
         } catch (error) {
-            console.error('Error setting up space key interaction:', error);
+            console.error('[PokemonCenterScene] Error setting up interaction keys:', error);
         }
-        
-        // Add exit detection
+    }
+
+    healPokemon() {
+        console.log('[PokemonCenterScene] Healing Pokemon started');
         try {
-            this.physics.add.overlap(this.player, this.exitArea, () => {
-                console.log('Player overlapped with exit area, exiting Pokemon Center');
-                this.exitPokemonCenter();
+            // Validate gameState.pokemon
+            if (!gameState.pokemon || !Array.isArray(gameState.pokemon)) {
+                console.error('[PokemonCenterScene] Error: gameState.pokemon is not an array or is undefined', gameState.pokemon);
+                return;
+            }
+
+            // Skip animation since assets aren't loading
+            console.log('[PokemonCenterScene] Starting healing process');
+            
+            // Heal all Pokemon
+            let healedCount = 0;
+            gameState.pokemon.forEach(pokemon => {
+                if (pokemon && pokemon.stats && pokemon.stats.hp) {
+                    console.log(`[PokemonCenterScene] Healing ${pokemon.key} from ${pokemon.currentHp} to ${pokemon.stats.hp} HP`);
+                    pokemon.currentHp = pokemon.stats.hp;
+                    healedCount++;
+                } else {
+                    console.warn(`[PokemonCenterScene] Skipping invalid Pokemon:`, pokemon);
+                }
             });
-            console.log('Exit area overlap detection set up successfully');
-        } catch (error) {
-            console.error('Error setting up exit area overlap detection:', error);
-        }
-        
-        // Add helper text
-        try {
-            this.add.text(400, 350, 'Press SPACE to heal when near the counter', {
-                fontSize: '18px',
-                fill: '#000'
+            
+            console.log(`[PokemonCenterScene] Healed ${healedCount} Pokemon`);
+            
+            // Show healing message with better styling
+            const healText = this.add.text(400, 400, 'Your Pokémon have been healed!', {
+                fontSize: '24px',
+                fill: '#FFFFFF',
+                backgroundColor: '#000000',
+                padding: { x: 20, y: 10 }
             }).setOrigin(0.5);
-            console.log('Helper text added successfully');
+            
+            // Remove the text after 2 seconds
+            this.time.delayedCall(2000, () => {
+                healText.destroy();
+                console.log('[PokemonCenterScene] Healing message removed');
+            });
+            
+            console.log('[PokemonCenterScene] Healing completed successfully');
         } catch (error) {
-            console.error('Error adding helper text:', error);
+            console.error('[PokemonCenterScene] Error in healPokemon method:', error);
+            // Show error message to user
+            const errorText = this.add.text(400, 400, 'Sorry, healing failed. Please try again.', {
+                fontSize: '24px',
+                fill: '#FF0000',
+                backgroundColor: '#000000',
+                padding: { x: 20, y: 10 }
+            }).setOrigin(0.5);
+            
+            this.time.delayedCall(2000, () => errorText.destroy());
         }
-        
-        console.log('PokemonCenterScene create method completed');
     }
     
     update() {
@@ -213,50 +323,36 @@ export default class PokemonCenterScene extends Phaser.Scene {
         }
     }
     
-    healPokemon() {
-        console.log('Healing Pokemon started');
-        try {
-            // Heal all Pokemon in the party
-            if (!gameState.pokemon || !Array.isArray(gameState.pokemon)) {
-                console.error('Error: gameState.pokemon is not an array or is undefined', gameState.pokemon);
-                return;
-            }
-            
-            gameState.pokemon.forEach(pokemon => {
-                console.log(`Healing Pokemon: ${pokemon.name} from ${pokemon.currentHp} to ${pokemon.stats.hp} HP`);
-                pokemon.currentHp = pokemon.stats.hp;
-            });
-            
-            // Show healing animation/message
-            try {
-                const healText = this.add.text(400, 400, 'Your Pokémon have been healed!', {
-                    fontSize: '24px',
-                    fill: '#000'
-                }).setOrigin(0.5);
-                console.log('Healing message displayed');
-                
-                // Remove the text after 2 seconds
-                this.time.delayedCall(2000, () => {
-                    healText.destroy();
-                    console.log('Healing message removed');
-                });
-            } catch (textError) {
-                console.error('Error creating or managing heal text:', textError);
-            }
-            console.log('Pokemon healing completed successfully');
-        } catch (error) {
-            console.error('Error in healPokemon method:', error);
-        }
-    }
-    
     exitPokemonCenter() {
-        console.log('Exiting Pokemon Center, returning to World scene');
+        console.log('[PokemonCenterScene] Attempting to exit Pokemon Center');
         try {
+            // Save player position before exiting
+            gameState.playerPosition = {
+                x: this.player.x,
+                y: this.player.y + 32 // Move player slightly down when exiting
+            };
+            console.log('[PokemonCenterScene] Saved player position:', gameState.playerPosition);
+
             // Return to world scene
             this.scene.start('World', { fromPokemonCenter: true });
-            console.log('World scene started successfully');
+            console.log('[PokemonCenterScene] Started World scene successfully');
         } catch (error) {
-            console.error('Error starting World scene:', error);
+            console.error('[PokemonCenterScene] Error exiting Pokemon Center:', error);
+            // Show error message to user
+            const errorText = this.add.text(400, 400, 'Unable to exit. Please try again.', {
+                fontSize: '24px',
+                fill: '#FF0000',
+                backgroundColor: '#000000',
+                padding: { x: 20, y: 10 }
+            }).setOrigin(0.5);
+            
+            this.time.delayedCall(2000, () => errorText.destroy());
         }
+    }
+
+    accessPCStorage() {
+        console.log('Accessing Pokemon Storage System');
+        this.scene.pause();
+        this.scene.launch('PokemonStorage');
     }
 }

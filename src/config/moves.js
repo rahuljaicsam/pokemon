@@ -15,12 +15,29 @@ export const MOVES = {
         accuracy: 100,
         pp: 35
     },
-    EMBER: {
-        name: 'Ember',
-        type: TYPES.FIRE,
+    GROWL: {
+        name: 'Growl',
+        type: TYPES.NORMAL,
+        power: 0,
+        accuracy: 100,
+        pp: 40,
+        statEffect: { stat: 'attack', change: -1 }
+    },
+    TAIL_WHIP: {
+        name: 'Tail Whip',
+        type: TYPES.NORMAL,
+        power: 0,
+        accuracy: 100,
+        pp: 30,
+        statEffect: { stat: 'defense', change: -1 }
+    },
+    BUBBLE: {
+        name: 'Bubble',
+        type: TYPES.WATER,
         power: 40,
         accuracy: 100,
-        pp: 25
+        pp: 30,
+        statEffect: { stat: 'speed', change: -1, chance: 0.1 }
     },
     WATER_GUN: {
         name: 'Water Gun',
@@ -29,12 +46,21 @@ export const MOVES = {
         accuracy: 100,
         pp: 25
     },
-    THUNDER_SHOCK: {
-        name: 'Thunder Shock',
-        type: TYPES.ELECTRIC,
+    EMBER: {
+        name: 'Ember',
+        type: TYPES.FIRE,
         power: 40,
         accuracy: 100,
-        pp: 30
+        pp: 25,
+        statusEffect: { status: 'burned', chance: 0.1 }
+    },
+    METAL_CLAW: {
+        name: 'Metal Claw',
+        type: TYPES.STEEL,
+        power: 50,
+        accuracy: 95,
+        pp: 35,
+        statEffect: { stat: 'attack', change: 1, chance: 0.1 }
     },
     VINE_WHIP: {
         name: 'Vine Whip',
@@ -42,6 +68,30 @@ export const MOVES = {
         power: 45,
         accuracy: 100,
         pp: 25
+    },
+    LEECH_SEED: {
+        name: 'Leech Seed',
+        type: TYPES.GRASS,
+        power: 0,
+        accuracy: 90,
+        pp: 10,
+        effect: 'leech'
+    },
+    THUNDER_SHOCK: {
+        name: 'Thunder Shock',
+        type: TYPES.ELECTRIC,
+        power: 40,
+        accuracy: 100,
+        pp: 30,
+        statusEffect: { status: 'paralyzed', chance: 0.1 }
+    },
+    QUICK_ATTACK: {
+        name: 'Quick Attack',
+        type: TYPES.NORMAL,
+        power: 40,
+        accuracy: 100,
+        pp: 30,
+        priority: 1
     },
     GUST: {
         name: 'Gust',
@@ -55,6 +105,7 @@ export const MOVES = {
         type: TYPES.BUG,
         power: 0,
         accuracy: 95,
-        pp: 40
+        pp: 40,
+        statEffect: { stat: 'speed', change: -1 }
     }
 }; 

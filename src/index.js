@@ -9,6 +9,7 @@ import InGameMenuScene from './scenes/InGameMenuScene';
 import PokedexScene from './scenes/PokedexScene';
 import PartyScene from './scenes/PartyScene';
 import PokemonCenterScene from './scenes/PokemonCenterScene';
+import PokemonStorageScene from './scenes/PokemonStorageScene';
 import SummaryScene from './scenes/SummaryScene';
 import BagScene from './scenes/BagScene';
 import PokeShopScene from './scenes/PokeShopScene';
@@ -29,6 +30,7 @@ class Game extends Phaser.Game {
         this.scene.add('Pokedex', PokedexScene);
         this.scene.add('Party', PartyScene);
         this.scene.add('PokemonCenter', PokemonCenterScene);
+        this.scene.add('PokemonStorage', PokemonStorageScene);
         this.scene.add('Summary', SummaryScene);
         this.scene.add('Bag', BagScene);
         this.scene.add('PokeShop', PokeShopScene);

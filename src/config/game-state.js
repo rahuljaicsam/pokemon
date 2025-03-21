@@ -1,4 +1,5 @@
 import { POKEMON_DATA, calculateStats, getMovesForLevel } from './pokemon-data';
+import { initializePokemonMoves } from '../utils/moveInitializer';
 import databaseService from '../services/database';
 
 class GameState {
@@ -128,42 +129,38 @@ class GameState {
         console.log('[GameState] Game saved to localStorage successfully');
     }
 
-    addPokemon(pokemonKey, level = 5) {
-        console.log(`[GameState] Adding Pokemon: ${pokemonKey} at level ${level}`);
+    addPokemon(pokemonKey, level) {
+        console.log('[GameState] Adding Pokémon:', pokemonKey, 'at level:', level);
+        
         const pokemonData = POKEMON_DATA[pokemonKey];
         if (!pokemonData) {
-            console.error(`[GameState] Pokemon data not found for key: ${pokemonKey}`);
-            return;
+            console.error('[GameState] Missing data for Pokémon:', pokemonKey);
+            return null;
         }
 
         const stats = calculateStats(pokemonKey, level);
-        const moves = getMovesForLevel(pokemonKey, level);
-
-        console.log(`[GameState] Calculated stats:`, stats);
-        console.log(`[GameState] Available moves:`, moves);
-
+        
         const pokemon = {
-            id: pokemonData.id,
             key: pokemonKey,
+            id: pokemonData.id,
             name: pokemonData.name,
             level,
             types: pokemonData.types,
             stats,
             currentHp: stats.hp,
-            moves: moves.slice(0, 4),
             exp: level * level * level,
             nextLevelExp: (level + 1) * (level + 1) * (level + 1)
         };
 
-        if (this.pokemon.length < 6) {
-            this.pokemon.push(pokemon);
-            console.log(`[GameState] Successfully added ${pokemon.name} to party`);
-        } else {
-            console.log('[GameState] Party is full, cannot add Pokemon');
-        }
+        // Initialize moves
+        initializePokemonMoves(pokemon);
 
+        this.pokemon.push(pokemon);
         this.pokedex.seen.add(pokemonKey);
         this.pokedex.caught.add(pokemonKey);
+        
+        console.log('[GameState] Added Pokémon:', pokemon);
+        return pokemon;
     }
 
     useItem(itemId, target) {

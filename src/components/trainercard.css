@@ -1,0 +1,119 @@
+/* Trainer Card Styling */
+.trainer-card {
+    background: linear-gradient(135deg, #4a90e2 0%, #2c5687 100%);
+    border: 4px solid #ffcb05;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    color: #ffffff;
+    font-family: 'Press Start 2P', cursive, Arial, sans-serif;
+}
+
+.trainer-card-header {
+    background-color: #ffcb05;
+    color: #1a1a1a;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    box-shadow: 0 3px 0 #b8860b;
+}
+
+.trainer-info-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.trainer-info {
+    flex: 1;
+}
+
+.trainer-sprite {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 10px;
+    border: 3px solid #ffcb05;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.info-label {
+    color: #ffcb05;
+    font-weight: bold;
+    margin-right: 10px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.info-value {
+    color: #ffffff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.info-row {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.badges-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.badges-title {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 5px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.badge-slots {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+
+.badge-slot {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #333333;
+    border: 2px solid #ffffff;
+    transition: all 0.3s ease;
+}
+
+.badge-slot.earned {
+    background: radial-gradient(circle, #ffcc00 0%, #ff9900 100%);
+    box-shadow: 0 0 10px #ffcc00;
+    transform: scale(1.1);
+}
+
+.controls-hint {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* ID Number styling */
+.id-number {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Animation for badge earning */
+@keyframes badgeEarned {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.badge-slot.earned:hover {
+    animation: badgeEarned 0.5s ease;
+}
