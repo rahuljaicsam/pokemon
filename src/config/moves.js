@@ -107,5 +107,36 @@ export const MOVES = {
         accuracy: 95,
         pp: 40,
         statEffect: { stat: 'speed', change: -1 }
+    },
+    SING: {
+        name: 'Sing',
+        type: TYPES.NORMAL,
+        power: 0,
+        accuracy: 55,
+        pp: 15,
+        statusEffect: { status: 'asleep', chance: 1.0 }
+    },
+    POUND: {
+        name: 'Pound',
+        type: TYPES.NORMAL,
+        power: 40,
+        accuracy: 100,
+        pp: 35
+    },
+    DOUBLE_SLAP: {
+        name: 'Double Slap',
+        type: TYPES.NORMAL,
+        power: 15,
+        accuracy: 85,
+        pp: 10,
+        multiHit: { min: 2, max: 5 }
+    },
+    DEFENSE_CURL: {
+        name: 'Defense Curl',
+        type: TYPES.NORMAL,
+        power: 0,
+        accuracy: 100,
+        pp: 40,
+        statEffect: { stat: 'defense', change: 1 }
     }
-}; 
+};

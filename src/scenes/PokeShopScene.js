@@ -18,43 +18,67 @@ export default class PokeShopScene extends Phaser.Scene {
         this.isSelectingQuantity = false;
     }
 
+    preload() {
+        // No external assets needed, we'll create everything with Phaser graphics
+    }
+
     create() {
-        // Add semi-transparent black background
-        this.add.rectangle(400, 300, 800, 600, 0xFFFFFF);
+        // Create PokeMart interior background using graphics
+        this.createShopBackground();
         
-        // Create walls
+        // Add CSS styling to the game canvas
+        this.applyCanvasStyling();
+        
+        // Create walls collision areas (invisible)
         this.walls = this.physics.add.staticGroup();
         
         // Left wall
-        this.walls.add(this.add.rectangle(0, 300, 20, 600, 0x666666));
+        this.walls.add(this.add.rectangle(10, 300, 20, 600, 0x666666).setVisible(false));
         // Right wall
-        this.walls.add(this.add.rectangle(800, 300, 20, 600, 0x666666));
+        this.walls.add(this.add.rectangle(790, 300, 20, 600, 0x666666).setVisible(false));
         // Top wall
-        this.walls.add(this.add.rectangle(400, 0, 800, 20, 0x666666));
+        this.walls.add(this.add.rectangle(400, 80, 800, 20, 0x666666).setVisible(false));
         // Bottom wall (except door area)
-        this.walls.add(this.add.rectangle(200, 590, 400, 20, 0x666666));
-        this.walls.add(this.add.rectangle(600, 590, 400, 20, 0x666666));
+        this.walls.add(this.add.rectangle(200, 590, 400, 20, 0x666666).setVisible(false));
+        this.walls.add(this.add.rectangle(600, 590, 400, 20, 0x666666).setVisible(false));
         
-        // Create counter
-        this.counter = this.physics.add.staticImage(400, 200, 'counter');
-        if (!this.textures.exists('counter')) {
-            this.counter = this.add.rectangle(400, 200, 300, 40, 0x8B4513);
-            this.physics.add.existing(this.counter, true);
-        }
+        // Create counter area (using rectangle instead of image)
+        this.counter = this.physics.add.staticGroup();
+        this.counter.add(this.add.rectangle(400, 200, 300, 50, 0x666666).setVisible(false));
         
-        // Create shopkeeper
-        this.shopkeeper = this.add.rectangle(400, 160, 32, 32, 0x4169E1);
+        // Create shopkeeper area (using rectangle instead of image)
+        this.shopkeeper = this.add.rectangle(400, 160, 50, 50, 0x666666).setVisible(false);
         
-        // Create interaction spot marker
-        this.shopSpot = this.add.rectangle(400, 250, 32, 32, 0xFFFF00, 0.3);
+        // Create interaction spot marker (subtle glow effect)
+        this.shopSpot = this.add.ellipse(400, 250, 50, 30, 0xFFFF00, 0.2);
         
         // Create player at entrance
         this.player = this.add.rectangle(400, 550, 32, 32, 0xFF0000);
         this.physics.world.enable(this.player);
         
         // Add exit area
-        this.exitArea = this.add.rectangle(400, 580, 64, 20, 0x00FF00, 0.3);
+        this.exitArea = this.add.rectangle(400, 580, 64, 20, 0x00FF00, 0.1);
         this.physics.world.enable(this.exitArea, Phaser.Physics.Arcade.STATIC_BODY);
+        
+        // Add subtle animation to shopkeeper
+        this.tweens.add({
+            targets: this.shopkeeper,
+            y: this.shopkeeper.y - 5,
+            duration: 2000,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+        
+        // Add subtle animation to shop spot
+        this.tweens.add({
+            targets: this.shopSpot,
+            alpha: 0.4,
+            duration: 1500,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
         
         // Set up collision
         this.physics.add.collider(this.player, this.walls);
@@ -82,11 +106,25 @@ export default class PokeShopScene extends Phaser.Scene {
             this.exitShop();
         });
         
-        // Add helper text
-        this.add.text(400, 350, 'Press SPACE to shop when near the counter', {
+        // Add helper text with better styling
+        const helpText = this.add.text(400, 350, 'Press SPACE to shop when near the counter', {
             fontSize: '18px',
-            fill: '#000'
+            fontFamily: 'Arial',
+            fill: '#000',
+            stroke: '#fff',
+            strokeThickness: 2,
+            shadow: { offsetX: 1, offsetY: 1, color: '#000', blur: 2, stroke: true, fill: true }
         }).setOrigin(0.5);
+        
+        // Add subtle animation to help text
+        this.tweens.add({
+            targets: helpText,
+            alpha: 0.7,
+            duration: 2000,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
 
         // Add scene resume event listener
         this.events.on('resume', () => {
@@ -131,5 +169,109 @@ export default class PokeShopScene extends Phaser.Scene {
     exitShop() {
         // Return to world scene
         this.scene.start('World', { fromShop: true });
+    }
+    
+    createShopBackground() {
+        // Create a graphics object for drawing the shop interior
+        const graphics = this.add.graphics();
+        
+        // Draw floor
+        graphics.fillStyle(0xEEEECC, 1); // Light cream color for floor
+        graphics.fillRect(0, 0, 800, 600);
+        
+        // Draw floor tiles pattern
+        graphics.lineStyle(1, 0xCCCCAA, 0.3);
+        for (let x = 0; x < 800; x += 40) {
+            graphics.moveTo(x, 0);
+            graphics.lineTo(x, 600);
+        }
+        for (let y = 0; y < 600; y += 40) {
+            graphics.moveTo(0, y);
+            graphics.lineTo(800, y);
+        }
+        
+        // Draw walls
+        graphics.fillStyle(0x99AADD, 1); // Light blue for walls
+        graphics.fillRect(0, 0, 800, 100); // Top wall
+        graphics.fillRect(0, 0, 20, 600);  // Left wall
+        graphics.fillRect(780, 0, 20, 600); // Right wall
+        
+        // Draw bottom wall with door opening
+        graphics.fillRect(0, 580, 350, 20);
+        graphics.fillRect(450, 580, 350, 20);
+        
+        // Draw counter
+        graphics.fillStyle(0xBB8855, 1); // Brown for counter
+        graphics.fillRect(250, 180, 300, 40);
+        graphics.fillStyle(0x996644, 1); // Darker brown for counter front
+        graphics.fillRect(250, 220, 300, 10);
+        
+        // Draw shelves on walls
+        graphics.fillStyle(0xBB8855, 1); // Brown for shelves
+        // Left shelves
+        graphics.fillRect(30, 120, 150, 15);
+        graphics.fillRect(30, 200, 150, 15);
+        graphics.fillRect(30, 280, 150, 15);
+        // Right shelves
+        graphics.fillRect(620, 120, 150, 15);
+        graphics.fillRect(620, 200, 150, 15);
+        graphics.fillRect(620, 280, 150, 15);
+        
+        // Draw items on shelves (colorful rectangles representing products)
+        const itemColors = [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x00FFFF];
+        
+        // Add items to left shelves
+        let itemIndex = 0;
+        for (let y of [130, 210, 290]) {
+            for (let x = 40; x < 170; x += 25) {
+                graphics.fillStyle(itemColors[itemIndex % itemColors.length], 1);
+                graphics.fillRect(x, y, 15, 20);
+                itemIndex++;
+            }
+        }
+        
+        // Add items to right shelves
+        itemIndex = 0;
+        for (let y of [130, 210, 290]) {
+            for (let x = 630; x < 760; x += 25) {
+                graphics.fillStyle(itemColors[itemIndex % itemColors.length], 1);
+                graphics.fillRect(x, y, 15, 20);
+                itemIndex++;
+            }
+        }
+        
+        // Draw register on counter
+        graphics.fillStyle(0x333333, 1); // Dark gray for register
+        graphics.fillRect(450, 160, 40, 30);
+        
+        // Draw shopkeeper (more detailed than just a rectangle)
+        graphics.fillStyle(0x3366CC, 1); // Blue for shopkeeper clothes
+        graphics.fillRect(385, 130, 30, 40); // Body
+        graphics.fillStyle(0xFFCCAA, 1); // Skin tone for face
+        graphics.fillCircle(400, 115, 15); // Head
+        
+        // Draw door
+        graphics.fillStyle(0x996644, 1); // Brown for door
+        graphics.fillRect(350, 580, 100, 20);
+        graphics.lineStyle(2, 0x663300, 1);
+        graphics.strokeRect(350, 580, 100, 20);
+    }
+    
+    applyCanvasStyling() {
+        // Get the canvas element
+        const canvas = this.sys.game.canvas;
+        
+        // Apply CSS styling to the canvas
+        canvas.style.border = '3px solid #333';
+        canvas.style.borderRadius = '5px';
+        canvas.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
+        
+        // Apply CSS to the parent container if needed
+        if (canvas.parentElement) {
+            canvas.parentElement.style.display = 'flex';
+            canvas.parentElement.style.justifyContent = 'center';
+            canvas.parentElement.style.alignItems = 'center';
+            canvas.parentElement.style.padding = '20px';
+        }
     }
 }

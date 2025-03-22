@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Floor -->
+  <rect x="0" y="0" width="800" height="600" fill="#e8e8e8" />
+  
+  <!-- Floor Tiles Pattern -->
+  <pattern id="floorPattern" patternUnits="userSpaceOnUse" width="40" height="40" patternTransform="rotate(45)">
+    <rect width="40" height="40" fill="#d8d8d8" />
+    <rect x="20" y="0" width="20" height="20" fill="#e0e0e0" />
+    <rect x="0" y="20" width="20" height="20" fill="#e0e0e0" />
+  </pattern>
+  <rect x="0" y="0" width="800" height="600" fill="url(#floorPattern)" />
+  
+  <!-- Walls -->
+  <rect x="0" y="0" width="800" height="150" fill="#6890f0" /> <!-- Top wall -->
+  <rect x="0" y="0" width="20" height="600" fill="#6890f0" /> <!-- Left wall -->
+  <rect x="780" y="0" width="20" height="600" fill="#6890f0" /> <!-- Right wall -->
+  
+  <!-- Wall Decorations -->
+  <rect x="0" y="150" width="800" height="10" fill="#386ceb" /> <!-- Wall trim -->
+  
+  <!-- Posters on Wall -->
+  <rect x="100" y="50" width="80" height="60" fill="#ff5252" stroke="#000" stroke-width="2" /> <!-- Poster 1 -->
+  <rect x="600" y="50" width="80" height="60" fill="#43a047" stroke="#000" stroke-width="2" /> <!-- Poster 2 -->
+  
+  <!-- Counter -->
+  <rect x="250" y="200" width="300" height="60" fill="#a1887f" stroke="#000" stroke-width="2" /> <!-- Counter base -->
+  <rect x="250" y="190" width="300" height="10" fill="#8d6e63" /> <!-- Counter top -->
+  <rect x="260" y="210" width="280" height="30" fill="#795548" /> <!-- Counter front panel -->
+  
+  <!-- Product Shelves (Left) -->
+  <rect x="50" y="200" width="150" height="250" fill="#90a4ae" stroke="#000" stroke-width="2" /> <!-- Shelf unit -->
+  <!-- Shelf dividers -->
+  <rect x="50" y="250" width="150" height="5" fill="#78909c" />
+  <rect x="50" y="300" width="150" height="5" fill="#78909c" />
+  <rect x="50" y="350" width="150" height="5" fill="#78909c" />
+  <rect x="50" y="400" width="150" height="5" fill="#78909c" />
+  
+  <!-- Products on Left Shelf -->
+  <circle cx="75" cy="225" r="15" fill="#f44336" /> <!-- Pokeball -->
+  <circle cx="115" cy="225" r="15" fill="#2196f3" /> <!-- Great Ball -->
+  <circle cx="155" cy="225" r="15" fill="#ffc107" /> <!-- Ultra Ball -->
+  
+  <rect x="60" y="275" width="20" height="20" fill="#f06292" /> <!-- Potion -->
+  <rect x="90" y="275" width="20" height="20" fill="#ba68c8" /> <!-- Super Potion -->
+  <rect x="120" y="275" width="20" height="20" fill="#9575cd" /> <!-- Hyper Potion -->
+  <rect x="150" y="275" width="20" height="20" fill="#7986cb" /> <!-- Max Potion -->
+  
+  <rect x="70" y="325" width="25" height="15" fill="#aed581" /> <!-- Antidote -->
+  <rect x="110" y="325" width="25" height="15" fill="#ffb74d" /> <!-- Paralyze Heal -->
+  <rect x="150" y="325" width="25" height="15" fill="#4fc3f7" /> <!-- Awakening -->
+  
+  <!-- Product Shelves (Right) -->
+  <rect x="600" y="200" width="150" height="250" fill="#90a4ae" stroke="#000" stroke-width="2" /> <!-- Shelf unit -->
+  <!-- Shelf dividers -->
+  <rect x="600" y="250" width="150" height="5" fill="#78909c" />
+  <rect x="600" y="300" width="150" height="5" fill="#78909c" />
+  <rect x="600" y="350" width="150" height="5" fill="#78909c" />
+  <rect x="600" y="400" width="150" height="5" fill="#78909c" />
+  
+  <!-- Products on Right Shelf -->
+  <rect x="625" y="225" width="25" height="15" fill="#fff176" /> <!-- Repel -->
+  <rect x="665" y="225" width="25" height="15" fill="#ffb74d" /> <!-- Super Repel -->
+  <rect x="705" y="225" width="25" height="15" fill="#4dd0e1" /> <!-- Max Repel -->
+  
+  <rect x="625" y="275" width="30" height="15" fill="#81c784" /> <!-- Leaf Stone -->
+  <rect x="665" y="275" width="30" height="15" fill="#ef5350" /> <!-- Fire Stone -->
+  <rect x="705" y="275" width="30" height="15" fill="#42a5f5" /> <!-- Water Stone -->
+  
+  <!-- Cash Register -->
+  <rect x="380" y="170" width="40" height="20" fill="#424242" />
+  
+  <!-- Door -->
+  <rect x="370" y="580" width="60" height="20" fill="#5c6bc0" stroke="#000" stroke-width="2" />
+  
+  <!-- Lights -->
+  <circle cx="200" cy="75" r="20" fill="#ffeb3b" opacity="0.8" />
+  <circle cx="400" cy="75" r="20" fill="#ffeb3b" opacity="0.8" />
+  <circle cx="600" cy="75" r="20" fill="#ffeb3b" opacity="0.8" />
+  
+  <!-- Shopkeeper Area -->
+  <rect x="380" y="160" width="40" height="30" fill="#5c6bc0" opacity="0.5" />
+</svg>

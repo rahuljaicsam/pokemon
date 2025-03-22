@@ -482,7 +482,10 @@ export const POKEMON_DATA = {
             evolvesTo: 'WIGGLYTUFF'
         },
         moves: {
-            1: [MOVES.TACKLE]
+            1: [MOVES.POUND],
+            4: [MOVES.DEFENSE_CURL],
+            9: [MOVES.SING],
+            14: [MOVES.DOUBLE_SLAP]
         }
     },
     ODDISH: {
@@ -1169,4 +1172,4 @@ export function getMovesForLevel(pokemonKey, level) {
 
     console.log(`[PokemonData] Selected moves for level ${level}:`, moves);
     return moves;
-} 
+}

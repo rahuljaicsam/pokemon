@@ -7,6 +7,15 @@
     padding: 15px;
     color: #ffffff;
     font-family: 'Press Start 2P', cursive, Arial, sans-serif;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: auto;
+    margin: 0 auto;
+    position: relative;
+    left: 0;
+    top: 0;
+    transform: none;
+    z-index: 100;
 }
 
 .trainer-card-header {
@@ -24,10 +33,12 @@
 .trainer-info-container {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .trainer-info {
     flex: 1;
+    min-width: 200px;
 }
 
 .trainer-sprite {
@@ -72,6 +83,7 @@
     display: flex;
     justify-content: space-around;
     margin-top: 10px;
+    flex-wrap: wrap;
 }
 
 .badge-slot {
@@ -81,6 +93,7 @@
     background-color: #333333;
     border: 2px solid #ffffff;
     transition: all 0.3s ease;
+    margin: 5px;
 }
 
 .badge-slot.earned {
@@ -116,4 +129,20 @@
 
 .badge-slot.earned:hover {
     animation: badgeEarned 0.5s ease;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+    .trainer-card {
+        max-width: 90%;
+        padding: 10px;
+    }
+    
+    .trainer-info-container {
+        flex-direction: column;
+    }
+    
+    .trainer-sprite {
+        margin: 10px auto;
+    }
 }

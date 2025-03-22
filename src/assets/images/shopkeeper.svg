@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Shopkeeper for PokeMart -->
+  
+  <!-- Head -->
+  <circle cx="32" cy="20" r="16" fill="#ffdbac" stroke="#000" stroke-width="1" />
+  
+  <!-- Hair -->
+  <path d="M16 20c0-8.8 7.2-16 16-16s16 7.2 16 16c0 0-4-6-16-6s-16 6-16 6z" fill="#4fc3f7" stroke="#000" stroke-width="1" />
+  
+  <!-- Eyes -->
+  <circle cx="26" cy="18" r="2" fill="#000" />
+  <circle cx="38" cy="18" r="2" fill="#000" />
+  
+  <!-- Smile -->
+  <path d="M26 26c3 2 9 2 12 0" fill="none" stroke="#000" stroke-width="1" stroke-linecap="round" />
+  
+  <!-- Body/Uniform -->
+  <rect x="20" y="36" width="24" height="24" fill="#5c6bc0" stroke="#000" stroke-width="1" />
+  
+  <!-- Collar -->
+  <path d="M20 36h24v4H20z" fill="#283593" stroke="#000" stroke-width="1" />
+  
+  <!-- Arms -->
+  <rect x="14" y="36" width="6" height="20" fill="#5c6bc0" stroke="#000" stroke-width="1" rx="3" />
+  <rect x="44" y="36" width="6" height="20" fill="#5c6bc0" stroke="#000" stroke-width="1" rx="3" />
+  
+  <!-- Hands -->
+  <circle cx="14" cy="56" r="3" fill="#ffdbac" stroke="#000" stroke-width="1" />
+  <circle cx="50" cy="56" r="3" fill="#ffdbac" stroke="#000" stroke-width="1" />
+  
+  <!-- Name Tag -->
+  <rect x="28" y="40" width="8" height="4" fill="#fff" stroke="#000" stroke-width="0.5" />
+  
+  <!-- Buttons -->
+  <circle cx="32" cy="48" r="1" fill="#fff" />
+  <circle cx="32" cy="52" r="1" fill="#fff" />
+</svg>
