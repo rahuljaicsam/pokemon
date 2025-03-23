@@ -153,7 +153,7 @@ class GameState {
         };
 
         // Initialize moves
-        initializePokemonMoves(pokemon);
+        pokemon.moves = initializePokemonMoves(pokemon.key, pokemon.level);
 
         this.pokemon.push(pokemon);
         this.pokedex.seen.add(pokemonKey);

@@ -154,7 +154,7 @@ export default class PartyScene extends Phaser.Scene {
         // Initialize moves for both Pokémon
         [this.switchSourceIndex, this.selectedIndex].forEach(index => {
             const pokemon = gameState.pokemon[index];
-            initializePokemonMoves(pokemon);
+            pokemon.moves = initializePokemonMoves(pokemon.key, pokemon.level);
         });
 
         // Reset switch mode
