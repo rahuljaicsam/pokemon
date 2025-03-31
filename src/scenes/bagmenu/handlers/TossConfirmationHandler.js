@@ -15,11 +15,11 @@ export default class TossConfirmationHandler {
     showDialog(item) {
         this.isVisible = true;
         this.selectedOption = 0;
-        this.item = item;
+        this.item = this.scene.itemListManager.getSelectedItem() || item;
         this.quantity = 1;
         this.createDialog();
         // Update button hints for confirmation dialog
-        this.scene.buttonHintsHandler.updateHints('TOSS_CONFIRMATION', item, this.selectedOption);
+        this.scene.buttonHintsHandler.updateHints('TOSS_CONFIRMATION', this.item, this.selectedOption);
     }
 
     /**

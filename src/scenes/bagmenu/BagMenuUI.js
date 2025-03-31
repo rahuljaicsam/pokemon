@@ -26,6 +26,10 @@ export default class BagMenuUI {
         this.createItemPanel();
         this.createDescriptionBox();
         this.createControlsHint();
+        
+        // Initial update
+        this.updateItemList();
+        this.updateItemDescription();
     }
     
     createBackground() {
@@ -166,7 +170,7 @@ export default class BagMenuUI {
         console.log('[BagMenuUI] Cleared existing items');
 
         // Get items for current category
-        const items = this.scene.itemsHandler.getCurrentItems();
+        const items = this.scene.itemDataProvider.getCurrentItems();
         console.log(`[BagMenuUI] Retrieved ${items.length} items for category ${this.scene.categoriesHandler.getSelectedCategory()}`);
         console.log('[BagMenuUI] Items:', items.map(item => item.name).join(', '));
         const startY = 0;
@@ -280,7 +284,7 @@ export default class BagMenuUI {
     
     updateItemDescription() {
         // Update description
-        const items = this.scene.itemsHandler.getCurrentItems();
+        const items = this.scene.itemDataProvider.getCurrentItems();
         console.log(`[BagMenuUI] Updating item description, isInItemList: ${this.scene.isInItemList}, items length: ${items.length}`);
         if (this.scene.isInItemList && items.length > 0) {
             const description = items[this.scene.selectedItem].description;

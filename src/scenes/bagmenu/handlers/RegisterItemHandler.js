@@ -1,86 +1,122 @@
-// Handler for registering and managing items assigned to the SELECT button
+// Handler for registering items in the BagMenu scene
 export default class RegisterItemHandler {
     constructor(scene) {
         this.scene = scene;
-        this.registeredItem = null;
+        this.isVisible = false;
+        this.selectedOption = 0; // 0: No, 1: Yes
+        this.item = null;
     }
 
     /**
-     * Register an item to the SELECT button
-     * @param {Object} item - The item to register
+     * Show the register confirmation dialog
+     * @param {Object} item - The item to be registered
      */
-    registerItem(item) {
-        // Only allow registering if the item is a Key Item or Berry
-        if (item.category === 'Key Items' || item.category === 'Berries') {
-            // If the same item is already registered, unregister it
-            if (this.registeredItem && this.registeredItem.id === item.id) {
-                this.unregisterItem();
-                return;
-            }
+    showDialog(item) {
+        this.isVisible = true;
+        this.selectedOption = 0;
+        this.item = item;
+        this.createDialog();
+        // Update button hints for confirmation dialog
+        this.scene.buttonHintsHandler.updateHints('REGISTER_CONFIRMATION', item, this.selectedOption);
+    }
 
-            this.registeredItem = item;
-            this.showRegistrationConfirmation();
+    /**
+     * Hide the register confirmation dialog
+     */
+    hideDialog() {
+        this.isVisible = false;
+        if (this.dialogContainer) {
+            this.dialogContainer.destroy();
+            this.dialogContainer = null;
         }
+        // Return to action menu
+        this.scene.navigationHandler.setCurrentLevel('ACTION_MENU');
+        this.scene.buttonHintsHandler.updateHints('ACTION_MENU');
     }
 
     /**
-     * Unregister the currently registered item
+     * Create the confirmation dialog graphics
      */
-    unregisterItem() {
-        this.registeredItem = null;
-        // Update any UI elements that show the registered item
-        this.scene.events.emit('itemUnregistered');
-    }
+    createDialog() {
+        if (this.dialogContainer) {
+            this.dialogContainer.destroy();
+        }
 
-    /**
-     * Show a confirmation message when an item is registered
-     */
-    showRegistrationConfirmation() {
-        // Create a temporary text message
-        const confirmText = this.scene.add.text(400, 300,
-            `${this.registeredItem.name} was registered\nto the SELECT button!`, {
-                fontSize: '16px',
+        this.dialogContainer = this.scene.add.container(300, 200);
+
+        // Create dialog background
+        const dialogBg = this.scene.add.graphics();
+        dialogBg.fillStyle(0xFFFFFF, 0.9);
+        dialogBg.fillRect(0, 0, 200, 100);
+        dialogBg.lineStyle(2, 0x000000);
+        dialogBg.strokeRect(0, 0, 200, 100);
+
+        // Add confirmation text
+        const messageText = this.scene.add.text(10, 10,
+            `Register ${this.item.name}?\nAre you sure?`, {
+                fontSize: '14px',
                 fill: '#000000',
-                align: 'center',
-                backgroundColor: '#FFFFFF',
-                padding: { x: 10, y: 5 }
+                wordWrap: { width: 180 }
             });
-        confirmText.setOrigin(0.5);
 
-        // Remove the text after 2 seconds
-        this.scene.time.delayedCall(2000, () => {
-            confirmText.destroy();
+        // Add options
+        const noText = this.scene.add.text(120, 60, 'NO', {
+            fontSize: '16px',
+            fill: '#000000'
+        });
+        const yesText = this.scene.add.text(160, 60, 'YES', {
+            fontSize: '16px',
+            fill: '#000000'
         });
 
-        // Emit event for other components to update
-        this.scene.events.emit('itemRegistered', this.registeredItem);
+        this.optionTexts = [noText, yesText];
+
+        // Add all elements to container
+        this.dialogContainer.add([dialogBg, messageText, ...this.optionTexts]);
+
+        // Update selection indicator
+        this.updateSelection();
     }
 
     /**
-     * Get the currently registered item
-     * @returns {Object|null} The registered item or null if none is registered
+     * Update the selection indicator in the dialog
      */
-    getRegisteredItem() {
-        return this.registeredItem;
+    updateSelection() {
+        this.optionTexts.forEach((text, index) => {
+            text.setColor(index === this.selectedOption ? '#FF0000' : '#000000');
+        });
     }
 
     /**
-     * Check if an item is currently registered
-     * @param {Object} item - The item to check
-     * @returns {boolean} True if the item is registered
+     * Navigate left in the dialog options
      */
-    isItemRegistered(item) {
-        return this.registeredItem && this.registeredItem.id === item.id;
-    }
-
-    /**
-     * Activate the registered item from the overworld
-     * This method should be called when the SELECT button is pressed
-     */
-    activateRegisteredItem() {
-        if (this.registeredItem) {
-            // Trigger the use action for the registered item
-            this.scene.itemsHandler.useItem(this.registeredItem);
+    navigateLeft() {
+        if (this.isVisible && this.selectedOption > 0) {
+            this.selectedOption--;
+            this.updateSelection();
+            this.scene.buttonHintsHandler.updateHints('REGISTER_CONFIRMATION', null, this.selectedOption);
         }
+    }
+
+    /**
+     * Navigate right in the dialog options
+     */
+    navigateRight() {
+        if (this.isVisible && this.selectedOption < 1) {
+            this.selectedOption++;
+            this.updateSelection();
+            this.scene.buttonHintsHandler.updateHints('REGISTER_CONFIRMATION', null, this.selectedOption);
+        }
+    }
+
+    /**
+     * Confirm the register action
+     */
+    confirm() {
+        if (this.selectedOption === 1) { // YES
+            // Execute the registration
+            this.scene.itemsHandler.executeRegister(this.item);
+        }
+        this.hideDialog();
     }
 }

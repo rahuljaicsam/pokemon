@@ -4,9 +4,16 @@ import { GBA_PALETTE } from '../../assets/tileset';
 export default class DecorationManager {
     constructor(scene) {
         this.scene = scene;
+        // IMPORTANT: Initialize decorations array for non-physics decorations
+        // Collidable decorations should be handled by physics groups in WorldScene
+        this.decorations = [];
     }
 
     createDecorations() {
+        // Clear existing NON-PHYSICS decorations if needed (less relevant now)
+        // this.decorations = []; // You might not need this array if not storing non-physics items
+        this.decorations = [];
+        
         // Add enhanced flowers with more detailed styling
         this.createFlowers();
         
@@ -15,6 +22,9 @@ export default class DecorationManager {
         
         // Add benches for resting
         this.createBenches();
+        
+        // Add decorations to scene for collision detection
+        this.scene.decorations = this.decorations;
     }
 
     createFlowers() {
@@ -25,6 +35,15 @@ export default class DecorationManager {
         ];
         
         flowerPositions.forEach(([x, y]) => {
+            // Create a non-collidable flower decoration for tracking
+            const flowerDecoration = this.scene.add.rectangle(x, y, 10, 10);
+            flowerDecoration.width = 10;
+            flowerDecoration.height = 10;
+            flowerDecoration.setVisible(false); // Invisible marker
+            flowerDecoration.noCollision = true; // Mark as non-collidable
+            
+            // Add to decorations array
+            this.decorations.push(flowerDecoration);
             // Create flower group for better organization
             const flowerGroup = this.scene.add.group();
             
@@ -148,28 +167,27 @@ export default class DecorationManager {
 
     createPonds() {
         const pondPositions = [[100, 400], [700, 150]];
-        
+
         pondPositions.forEach(([x, y]) => {
-            // Create pond group
-            const pondGroup = this.scene.add.group();
-            
-            // Pond base with better styling
-            const pondBase = this.scene.add.ellipse(x, y, 90, 60, 0x000033);
-            pondBase.setDepth(0.55);
+            // --- RE-ADD THE VISUAL POND ELEMENTS ---
+            const pondGroup = this.scene.add.group(); // Group for visual elements of this pond
+
+            // Pond base (visual)
+            const pondBase = this.scene.add.ellipse(x, y, 90, 60, 0x000033); // Use a dark blue/black for base
+            pondBase.setDepth(0.55); // Ensure it's behind the main water
             pondGroup.add(pondBase);
-            
-            // Main pond water
+
+            // Main pond water (visual)
             const pond = this.scene.add.ellipse(x, y, 80, 50, GBA_PALETTE.WATER_BLUE);
-            pond.setStrokeStyle(2, 0x0000A0);
-            pond.setDepth(0.6);
+            pond.setStrokeStyle(2, 0x0000A0); // Darker blue stroke
+            pond.setDepth(0.6); // Above base, below lily pads
             pondGroup.add(pond);
-            
-            // Add multiple ripple effects for more dynamic water
+
+            // Ripples (visual)
             for (let i = 0; i < 3; i++) {
                 const ripple = this.scene.add.ellipse(x, y, 60 - i * 15, 35 - i * 10, GBA_PALETTE.WATER_BLUE, 0.5 - i * 0.1);
                 ripple.setDepth(0.7);
                 pondGroup.add(ripple);
-                
                 this.scene.tweens.add({
                     targets: ripple,
                     scaleX: 1.2 + i * 0.1,
@@ -181,89 +199,112 @@ export default class DecorationManager {
                     delay: i * 700
                 });
             }
-            
+
             // Add lily pads
             this.addLilyPads(x, y, pondGroup);
-            
-            // Add occasional jumping fish animation
+
+            // Add jumping fish animation
             this.addJumpingFish(x, y);
+
+            // --- POND COLLISION/INTERACTION AREA ---
+            const pondCollision = this.scene.add.ellipse(x, y, 80, 50);
+            pondCollision.setVisible(false);
+            pondCollision.isPond = true;
+            this.scene.physics.add.existing(pondCollision, true);
+
+            if (this.scene.pondAreas) {
+                console.log('[DecorationManager] Adding pond collision object to group:', pondCollision);
+                this.scene.pondAreas.add(pondCollision);
+            } else {
+                console.error('[DecorationManager] pondAreas group does not exist on scene!');
+            }
         });
     }
 
     addLilyPads(x, y, pondGroup) {
-        const lilyPadCount = 2 + Math.floor(Math.random() * 3);
-        for (let i = 0; i < lilyPadCount; i++) {
-            const padAngle = Math.random() * Math.PI * 2;
-            const padDistance = Math.random() * 25;
-            const padX = x + Math.cos(padAngle) * padDistance;
-            const padY = y + Math.sin(padAngle) * padDistance;
-            
-            const lilyPad = this.scene.add.ellipse(padX, padY, 12, 10, 0x006600);
+        const lilyPadPositions = [
+            [x - 20, y - 10],
+            [x + 15, y + 5],
+            [x - 5, y + 15]
+        ];
+
+        lilyPadPositions.forEach(([padX, padY]) => {
+            // Create lily pad
+            const lilyPad = this.scene.add.ellipse(padX, padY, 12, 8, 0x228B22);
             lilyPad.setRotation(Math.random() * Math.PI * 2);
-            lilyPad.setStrokeStyle(1, 0x003300);
-            lilyPad.setDepth(0.65);
+            lilyPad.setStrokeStyle(1, 0x006400);
+            lilyPad.setDepth(0.8);
             pondGroup.add(lilyPad);
-            
-            // Random chance to add a flower to the lily pad
-            if (Math.random() > 0.5) {
-                const lilyFlower = this.scene.add.circle(padX, padY, 3, 0xFF00FF);
-                lilyFlower.setDepth(0.66);
-                pondGroup.add(lilyFlower);
-            }
-            
-            // Add subtle floating animation
+
+            // Add small flower on lily pad
+            const lilyFlower = this.scene.add.circle(padX + 2, padY - 2, 3, 0xFF69B4);
+            lilyFlower.setDepth(0.9);
+            pondGroup.add(lilyFlower);
+
+            // Add gentle floating animation
             this.scene.tweens.add({
-                targets: lilyPad,
-                x: padX + (Math.random() * 6 - 3),
-                y: padY + (Math.random() * 6 - 3),
-                duration: 4000 + Math.random() * 2000,
+                targets: [lilyPad, lilyFlower],
+                y: padY + 3,
+                duration: 2000,
                 yoyo: true,
                 repeat: -1,
                 ease: 'Sine.easeInOut'
             });
-        }
+        });
     }
 
     addJumpingFish(x, y) {
+        const jumpInterval = Phaser.Math.Between(8000, 15000);
+
         this.scene.time.addEvent({
-            delay: 5000 + Math.random() * 10000,
+            delay: jumpInterval,
             callback: () => {
-                // Create fish jumping arc
-                const jumpStartX = x + (Math.random() * 30 - 15);
-                const jumpStartY = y + (Math.random() * 20 - 10);
-                
-                const fish = this.scene.add.ellipse(jumpStartX, jumpStartY, 8, 4, 0xC0C0C0);
-                fish.setStrokeStyle(1, 0x808080);
-                fish.setDepth(0.75);
-                
-                // Create jumping animation
-                this.scene.tweens.add({
-                    targets: fish,
-                    x: jumpStartX + (Math.random() * 20 - 10),
-                    y: jumpStartY - 30,
-                    scaleX: 1.2,
-                    scaleY: 1.2,
-                    angle: 180,
-                    duration: 500,
-                    yoyo: true,
-                    onComplete: () => fish.destroy(),
-                    ease: 'Quad.easeOut'
-                });
-                
-                // Create water splash effect
-                const splash = this.scene.add.circle(jumpStartX, jumpStartY, 5, 0xFFFFFF, 0.7);
-                splash.setDepth(0.7);
-                
-                this.scene.tweens.add({
-                    targets: splash,
-                    scale: 2,
-                    alpha: 0,
-                    duration: 300,
-                    onComplete: () => splash.destroy(),
-                    ease: 'Quad.easeOut'
-                });
+                // Only create fish if pond is on screen
+                if (Phaser.Math.Distance.Between(
+                    x, y,
+                    this.scene.player.x,
+                    this.scene.player.y
+                ) < 400) {
+                    this.createFishJumpEffect(x, y);
+                }
             },
             loop: true
+        });
+    }
+
+    createFishJumpEffect(x, y) {
+        // Create fish visual
+        const fish = this.scene.add.ellipse(
+            x + Phaser.Math.Between(-20, 20),
+            y,
+            8,
+            4,
+            GBA_PALETTE.WATER_BLUE
+        );
+        fish.setDepth(1);
+
+        // Create splash effect
+        const splash = this.scene.add.ellipse(fish.x, y, 20, 10, 0xFFFFFF, 0.7);
+        splash.setDepth(0.9);
+
+        // Animate fish jump
+        this.scene.tweens.add({
+            targets: fish,
+            y: y - 30,
+            scaleX: 0.8,
+            duration: 600,
+            yoyo: true,
+            ease: 'Quad.easeOut',
+            onComplete: () => fish.destroy()
+        });
+
+        // Animate splash
+        this.scene.tweens.add({
+            targets: splash,
+            scale: 1.5,
+            alpha: 0,
+            duration: 400,
+            onComplete: () => splash.destroy()
         });
     }
 
@@ -271,31 +312,56 @@ export default class DecorationManager {
         const benchPositions = [[300, 400], [500, 150]];
         
         benchPositions.forEach(([x, y]) => {
-            // Bench base
-            const benchBase = this.scene.add.rectangle(x, y, 32, 8, 0x8B4513);
-            benchBase.setStrokeStyle(1, 0x654321);
-            benchBase.setDepth(0.8);
+            // Create bench group
+            const benchGroup = this.scene.add.group();
+            
+            // Bench seat
+            const benchSeat = this.scene.add.rectangle(x, y, 40, 15, 0x8B4513);
+            benchSeat.setStrokeStyle(1, 0x3D2314);
+            benchSeat.setDepth(1);
+            benchGroup.add(benchSeat);
             
             // Bench legs
-            const legLeft = this.scene.add.rectangle(x - 12, y + 6, 4, 12, 0x8B4513);
-            const legRight = this.scene.add.rectangle(x + 12, y + 6, 4, 12, 0x8B4513);
-            legLeft.setStrokeStyle(1, 0x654321);
-            legRight.setStrokeStyle(1, 0x654321);
-            legLeft.setDepth(0.8);
-            legRight.setDepth(0.8);
+            const leftLeg = this.scene.add.rectangle(x - 15, y + 10, 5, 10, 0x3D2314);
+            const rightLeg = this.scene.add.rectangle(x + 15, y + 10, 5, 10, 0x3D2314);
+            leftLeg.setDepth(1);
+            rightLeg.setDepth(1);
+            benchGroup.add(leftLeg);
+            benchGroup.add(rightLeg);
             
             // Bench back
-            const benchBack = this.scene.add.rectangle(x, y - 8, 32, 4, 0x8B4513);
-            benchBack.setStrokeStyle(1, 0x654321);
-            benchBack.setDepth(0.8);
+            const benchBack = this.scene.add.rectangle(x, y - 10, 40, 5, 0x8B4513);
+            benchBack.setStrokeStyle(1, 0x3D2314);
+            benchBack.setDepth(1);
+            benchGroup.add(benchBack);
             
             // Back supports
-            const supportLeft = this.scene.add.rectangle(x - 12, y - 4, 2, 8, 0x8B4513);
-            const supportRight = this.scene.add.rectangle(x + 12, y - 4, 2, 8, 0x8B4513);
-            supportLeft.setStrokeStyle(1, 0x654321);
-            supportRight.setStrokeStyle(1, 0x654321);
-            supportLeft.setDepth(0.8);
-            supportRight.setDepth(0.8);
+            const leftSupport = this.scene.add.rectangle(x - 15, y - 5, 3, 15, 0x3D2314);
+            const rightSupport = this.scene.add.rectangle(x + 15, y - 5, 3, 15, 0x3D2314);
+            leftSupport.setDepth(1);
+            rightSupport.setDepth(1);
+            benchGroup.add(leftSupport);
+            benchGroup.add(rightSupport);
+            
+            // Add collision for bench using physics
+            const benchCollision = this.scene.add.rectangle(x, y, 40, 20);
+            benchCollision.width = 40;
+            benchCollision.height = 20;
+            benchCollision.setVisible(false); // Invisible collision area
+            benchCollision.isBench = true; // Mark as bench for identification
+            
+            // Add physics to the bench collision object
+            this.scene.physics.add.existing(benchCollision, true); // true = static body
+            
+            // Add to the scene's obstacles group for proper collision handling
+            if (this.scene.obstaclesGroup) {
+                console.log('[DecorationManager] Adding bench collision object to obstacles group:', benchCollision);
+                this.scene.obstaclesGroup.add(benchCollision);
+            } else {
+                console.error('[DecorationManager] obstaclesGroup does not exist on scene!');
+                // Fallback to decorations array if obstacles group doesn't exist
+                this.decorations.push(benchCollision);
+            }
         });
     }
 }

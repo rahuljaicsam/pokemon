@@ -7,6 +7,8 @@ import BagMenuInput from './BagMenuInput';
 import CategoryNavigationHandler from './handlers/CategoryNavigationHandler';
 import ActionMenuHandler from './handlers/ActionMenuHandler';
 import ButtonHintsHandler from './handlers/ButtonHintsHandler';
+import BagMenuItems from './BagMenuItems';
+import ItemListManager from './handlers/ItemListManager';
 
 export default class BagScene extends Phaser.Scene {
     constructor() {
@@ -19,15 +21,22 @@ export default class BagScene extends Phaser.Scene {
     create() {
         console.log('[BagScene] Initializing components');
         // Initialize handlers and components in CORRECT DEPENDENCY ORDER:
-        this.itemsHandler = new ItemsHandler(this);        // 1. ItemsHandler (no dependencies)
-        this.buttonHintsHandler = new ButtonHintsHandler(this); // 2. ButtonHintsHandler (no dependencies)
-        this.categoriesHandler = new CategoryNavigationHandler(this); // 3. CategoryNavigationHandler (depends on ItemsHandler)
-        this.actionMenuHandler = new ActionMenuHandler(this);   // 4. ActionMenuHandler (depends on ButtonHintsHandler)
-        this.ui = new BagMenuUI(this);                     // 5. UI (after handlers for immediate UI updates)
-        this.inputHandler = new BagMenuInput(this);         // 6. InputHandler (depends on all navigation and action handlers)
+        // 1. Data providers and handlers (no dependencies)
+        this.itemDataProvider = new BagMenuItems(this);     // Provides raw item data
+        this.itemsHandler = new ItemsHandler(this);        // Handles item actions (use, toss)
+        this.buttonHintsHandler = new ButtonHintsHandler(this);
+
+        // 2. Navigation and list management
+        this.categoriesHandler = new CategoryNavigationHandler(this);
+        this.itemListManager = new ItemListManager(this, this.itemDataProvider); // Manages item list display and scrolling
+
+        // 3. UI and input (depends on handlers)
+        this.actionMenuHandler = new ActionMenuHandler(this);
+        this.ui = new BagMenuUI(this);
+        this.inputHandler = new BagMenuInput(this);
         
         // Update the item list now that all components are initialized
-        this.itemsHandler.updateItemList(this.categoriesHandler.getSelectedCategory());
+        this.itemListManager.updateItemList(this.categoriesHandler.getSelectedCategory());
         console.log('[BagScene] Item list updated with initial category');
         
         // Update UI with initial items

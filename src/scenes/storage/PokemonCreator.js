@@ -3,7 +3,10 @@ import { initializePokemonMoves } from '../../utils/moveInitializer';
 
 export const createPokemonData = (key, level, stats, moves, types, nature, ability) => {
     console.log(`[PokemonStorage] Creating Pokémon data for ${key} at level ${level}`);
-    const pokemonData = POKEMON_DATA[key];
+    // Try to get Pokemon data with original key and uppercase key
+    const upperKey = key.toUpperCase();
+    const pokemonData = POKEMON_DATA[key] || POKEMON_DATA[upperKey];
+    console.log('[PokemonStorage] Attempting to access Pokemon data:', { originalKey: key, upperKey, hasData: !!pokemonData });
     if (!pokemonData) {
         console.error('[PokemonStorage] Missing data for Pokémon:', key);
         return null;
@@ -40,4 +43,4 @@ export const createPokemonData = (key, level, stats, moves, types, nature, abili
 
     console.log(`[PokemonStorage] Created Pokémon object for ${key}:`, pokemon);
     return pokemon;
-}; 
+};

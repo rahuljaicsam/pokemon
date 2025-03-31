@@ -70,15 +70,15 @@ export default class CategoryNavigationHandler {
         
         // Reset item selection when changing categories
         this.scene.selectedItem = 0;
-        this.scene.itemsHandler.resetScroll();
+        this.scene.itemListManager.resetScroll();
         
         // Update the item list for the new category
         const categoryName = this.getSelectedCategory();
         console.log(`[CategoryNavigationHandler] Updating item list for category: ${categoryName}`);
-        this.scene.itemsHandler.updateItemList(categoryName);
+        this.scene.itemListManager.updateItemList(categoryName);
         
         // Get the updated items to verify they've changed
-        const updatedItems = this.scene.itemsHandler.getCurrentItems();
+        const updatedItems = this.scene.itemDataProvider.getCurrentItems();
         console.log(`[CategoryNavigationHandler] Updated items for category ${categoryName}:`, updatedItems.map(item => item.name).join(', '));
         
         // Update the UI to reflect the new items

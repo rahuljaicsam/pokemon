@@ -1,71 +1,50 @@
-// Handler for managing items in the BagMenu scene
-import BagMenuItems from '../BagMenuItems';
-
-export default class ItemsHandler extends BagMenuItems {
+// Handler for item operations in the BagMenu scene
+export default class ItemsHandler {
     constructor(scene) {
-        super(scene);
-        this.scrollOffset = 0;
-        this.visibleItemCount = 6; // Number of items visible at once
-        this.currentItems = [];
+        this.scene = scene;
     }
 
     /**
-     * Update the item list for a given category
-     * @param {String} category - The category to display items for
+     * Use the selected item
+     * @param {Object} item - The item to use
      */
-    updateItemList(category) {
-        this.currentItems = this.getItemsForCategory(category);
-        this.resetScroll();
+    useItem(item) {
+        // Implementation will vary based on item type and game state
+        console.log(`Using item: ${item.name}`);
+        // TODO: Implement item usage logic based on item type
     }
 
     /**
-     * Reset the scroll position to the top
+     * Execute the toss action for an item
+     * @param {Object} item - The item to toss
+     * @param {number} quantity - The quantity to toss
      */
-    resetScroll() {
-        this.scrollOffset = 0;
+    executeToss(item, quantity) {
+        console.log(`Tossing ${quantity} ${item.name}(s)`);
+        // TODO: Implement item tossing logic
+        // Update inventory
+        // Refresh the item list display
     }
 
     /**
-     * Get the number of items that can be displayed at once
-     * @returns {Number} Number of visible items
+     * Execute the register action for an item
+     * @param {Object} item - The item to register
      */
-    getVisibleItemCount() {
-        return this.visibleItemCount;
+    executeRegister(item) {
+        console.log(`Registering item: ${item.name}`);
+        // TODO: Implement item registration logic
+        // Add to registered items list
+        // Update UI to reflect registration
     }
 
     /**
-     * Get the current scroll offset
-     * @returns {Number} Current scroll offset
-     */
-    getScrollOffset() {
-        return this.scrollOffset;
-    }
-
-    /**
-     * Scroll the item list up
-     */
-    scrollUp() {
-        if (this.scrollOffset > 0) {
-            this.scrollOffset--;
-        }
-    }
-
-    /**
-     * Scroll the item list down
-     */
-    scrollDown() {
-        const maxScroll = Math.max(0, this.currentItems.length - this.visibleItemCount);
-        if (this.scrollOffset < maxScroll) {
-            this.scrollOffset++;
-        }
-    }
-
-    /**
-     * Learn a move from a TM or HM
-     * @param {Object} item - The TM or HM item to learn from
+     * Learn a move from a TM/HM
+     * @param {Object} item - The TM/HM item
      */
     learnMove(item) {
-        // Implementation for learning moves will be added later
-        console.log(`Learning move from ${item.name}`);
+        console.log(`Learning move from: ${item.name}`);
+        // TODO: Implement move learning logic
+        // Show move learning interface
+        // Handle move learning process
     }
 }

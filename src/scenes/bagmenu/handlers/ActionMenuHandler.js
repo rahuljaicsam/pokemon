@@ -91,13 +91,16 @@ export default class ActionMenuHandler {
             this.menuContainer.destroy();
         }
 
-        // Create menu container
-        this.menuContainer = this.scene.add.container(400, 300);
+        // Create menu container with proper positioning and depth
+        this.menuContainer = this.scene.add.container(500, 200);
+        this.menuContainer.setDepth(100); // Ensure menu appears above other UI elements
 
-        // Create menu background
+        // Create menu background with border
         const menuBg = this.scene.add.graphics();
-        menuBg.fillStyle(0xFFFFFF, 0.8);
+        menuBg.lineStyle(2, 0x000000, 1);
+        menuBg.fillStyle(0xFFFFFF, 0.9);
         menuBg.fillRect(0, 0, 120, this.actions.length * 30 + 20);
+        menuBg.strokeRect(0, 0, 120, this.actions.length * 30 + 20);
         menuBg.lineStyle(2, 0x000000);
         menuBg.strokeRect(0, 0, 120, this.actions.length * 30 + 20);
 

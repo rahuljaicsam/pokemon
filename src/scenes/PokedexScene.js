@@ -1,4 +1,8 @@
-import { POKEMON_SPRITES } from '../config/pokemon-sprites';
+// Import from the modular Pokedex implementation
+import PokedexScene from './pokedex';
+
+// These imports are kept for reference but are no longer used directly
+// as they're now handled by the modular implementation
 import { POKEMON_DATA } from '../config/pokemon-data';
 import { gameState } from '../config/game-state';
 
@@ -112,4 +116,4 @@ export default class PokedexScene extends Phaser.Scene {
         this.seenIcon.setFillStyle(isSeen ? 0x00FF00 : 0x888888);
         this.caughtIcon.setFillStyle(isCaught ? 0x00FF00 : 0x888888);
     }
-} 
+}
