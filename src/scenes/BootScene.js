@@ -16,7 +16,7 @@ export default class BootScene extends Phaser.Scene {
         progressBox.fillRect(width / 4, height / 2 - 30, width / 2, 50);
         
         // Loading text
-        const loadingText = this.add.text(width / 2, height / 2 - 50, 'Loading...', {
+        const loadingText = this.add.text(width / 2, height / 2 - 50, 'Pokemon are coming to VIBE GAME...', {
             font: '20px monospace',
             fill: '#ffffff'
         });
